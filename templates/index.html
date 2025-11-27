@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Social Media Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .result-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item.no-link {
+            border-left-color: #dc3545;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-link {
+            color: #667eea;
+            text-decoration: none;
+            word-break: break-all;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .result-link:hover {
+            text-decoration: underline;
+        }
+
+        .no-link {
+            color: #999;
+            font-style: italic;
+        }
+
+        .confidence {
+            margin-top: 15px;
+            padding: 10px;
+            background: #e7f3ff;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #0066cc;
+        }
+
+        .confidence.high {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .confidence.medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .confidence.low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .sources {
+            margin-top: 10px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .icon {
+            width: 20px;
+            height: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Business Social Media Finder</h1>
+        <p class="subtitle">Find Instagram and Facebook links for any business</p>
+        
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="businessName">Business Name</label>
+                <input type="text" id="businessName" name="businessName" placeholder="e.g., McDonald's" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" placeholder="e.g., Kuwait" required>
+            </div>
+            
+            <button type="submit" id="searchBtn">Search Social Media Links</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #666;">Searching for social media links...</p>
+        </div>
+
+        <div class="error" id="error"></div>
+
+        <div class="results" id="results">
+            <div class="result-item" id="instagramResult">
+                <div class="result-label">
+                    <span>📷 Instagram</span>
+                </div>
+                <div id="instagramLink" class="no-link">No Instagram link found</div>
+            </div>
+
+            <div class="result-item" id="facebookResult">
+                <div class="result-label">
+                    <span>👥 Facebook</span>
+                </div>
+                <div id="facebookLink" class="no-link">No Facebook link found</div>
+            </div>
+
+            <div class="result-item" id="websiteResult">
+                <div class="result-label">
+                    <span>🌐 Official Website</span>
+                </div>
+                <div id="websiteLink" class="no-link">No website found</div>
+            </div>
+
+            <div class="confidence" id="confidence"></div>
+            <div class="sources" id="sources"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('searchForm');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const error = document.getElementById('error');
+        const searchBtn = document.getElementById('searchBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const businessName = document.getElementById('businessName').value;
+            const country = document.getElementById('country').value;
+
+            // Show loading, hide results and error
+            loading.classList.add('show');
+            results.classList.remove('show');
+            error.classList.remove('show');
+            searchBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        business_name: businessName,
+                        country: country
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'An error occurred');
+                }
+
+                // Display results
+                displayResults(data);
+                results.classList.add('show');
+
+            } catch (err) {
+                error.textContent = err.message;
+                error.classList.add('show');
+            } finally {
+                loading.classList.remove('show');
+                searchBtn.disabled = false;
+            }
+        });
+
+        function displayResults(data) {
+            // Instagram
+            const instagramLink = document.getElementById('instagramLink');
+            const instagramResult = document.getElementById('instagramResult');
+            
+            if (data.instagram) {
+                instagramLink.innerHTML = `<a href="${data.instagram}" target="_blank" class="result-link">${data.instagram}</a>`;
+                instagramResult.classList.remove('no-link');
+            } else {
+                instagramLink.textContent = 'No Instagram link found';
+                instagramResult.classList.add('no-link');
+            }
+
+            // Facebook
+            const facebookLink = document.getElementById('facebookLink');
+            const facebookResult = document.getElementById('facebookResult');
+            
+            if (data.facebook) {
+                facebookLink.innerHTML = `<a href="${data.facebook}" target="_blank" class="result-link">${data.facebook}</a>`;
+                facebookResult.classList.remove('no-link');
+            } else {
+                facebookLink.textContent = 'No Facebook link found';
+                facebookResult.classList.add('no-link');
+            }
+
+            // Website
+            const websiteLink = document.getElementById('websiteLink');
+            const websiteResult = document.getElementById('websiteResult');
+            
+            if (data.website) {
+                websiteLink.innerHTML = `<a href="${data.website}" target="_blank" class="result-link">${data.website}</a>`;
+                websiteResult.classList.remove('no-link');
+            } else {
+                websiteLink.textContent = 'No website found';
+                websiteResult.classList.add('no-link');
+            }
+
+            // Confidence
+            const confidence = document.getElementById('confidence');
+            confidence.textContent = `Confidence: ${data.confidence.toUpperCase()}`;
+            confidence.className = `confidence ${data.confidence}`;
+
+            // Sources
+            const sources = document.getElementById('sources');
+            if (data.sources && data.sources.length > 0) {
+                sources.textContent = `Sources: ${data.sources.join(', ')}`;
+            } else {
+                sources.textContent = '';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
