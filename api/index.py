@@ -14,11 +14,6 @@ os.chdir(parent_dir)
 # Import Flask app
 from app import app
 
-# Create a WSGI handler function for Vercel
-def handler(request, response):
-    """Vercel serverless function handler"""
-    return app(request.environ, response.start_response)
-
-# Also export app directly as fallback
-__all__ = ['handler', 'app']
+# Vercel Python runtime expects 'handler' to be the WSGI application
+handler = app
 
