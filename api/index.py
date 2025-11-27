@@ -14,11 +14,7 @@ os.chdir(parent_dir)
 # Import Flask app
 from app import app
 
-# Use vercel-python-wsgi adapter for proper Flask handling on Vercel
-try:
-    from vercel_python_wsgi import VercelWSGI
-    handler = VercelWSGI(app)
-except ImportError:
-    # Fallback: use app directly if vercel-python-wsgi is not available
-    handler = app
+# Vercel Python runtime - export the Flask app as handler
+# The app must be the WSGI application directly
+handler = app
 
