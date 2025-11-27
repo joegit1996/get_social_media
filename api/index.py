@@ -11,10 +11,16 @@ if parent_dir not in sys.path:
 # Change working directory to project root for template resolution
 os.chdir(parent_dir)
 
-# Import Flask app
-from app import app
+# Import Flask app - ensure it's fully initialized
+from app import app as flask_app
 
-# Vercel Python runtime - export the Flask app as handler
-# The app must be the WSGI application directly
-handler = app
+# Verify the app is a Flask instance before exporting
+# Vercel Python runtime expects 'handler' to be the WSGI application
+if hasattr(flask_app, '__call__'):
+    handler = flask_app
+else:
+    # Fallback: create a simple handler
+    def handler(environ, start_response):
+        start_response('500 Internal Server Error', [('Content-Type', 'text/plain')])
+        return [b'Flask app initialization error']
 
