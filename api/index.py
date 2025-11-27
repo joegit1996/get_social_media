@@ -12,9 +12,13 @@ if parent_dir not in sys.path:
 os.chdir(parent_dir)
 
 # Import Flask app
-from app import app as flask_app
+from app import app
 
-# Vercel Python runtime handler
-# Export the Flask WSGI application directly
-handler = flask_app
+# Create a WSGI handler function for Vercel
+def handler(request, response):
+    """Vercel serverless function handler"""
+    return app(request.environ, response.start_response)
+
+# Also export app directly as fallback
+__all__ = ['handler', 'app']
 
